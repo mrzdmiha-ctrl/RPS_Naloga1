@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Oddaja naloge: {{ naloga.naslov }} | E-Šola{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-custom p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <span class="badge bg-primary font-monospace">{{ predmet.koda }} - {{ predmet.naziv }}</span>
+                    <h3 class="fw-bold mb-1 mt-2">{{ naloga.naslov }}</h3>
+                    <p class="text-muted small mb-0">
+                        Rok za oddajo: 
+                        {% if naloga.rok_oddaje %}
+                            <strong class="{% if naloga.je_rok_potekel %}text-danger{% else %}text-dark{% endif %}">
+                                {{ naloga.rok_oddaje|date:"d.m.Y H:i" }}
+                            </strong>
+                        {% else %}
+                            <span>Ni časovne omejitve</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <a href="{% url 'ucenec_predmet_gradiva' predmet.pk %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Nazaj na gradiva
+                </a>
+            </div>
+
+            <!-- Navodila naloge -->
+            <div class="card p-3 bg-light mb-4 border-0">
+                <h6 class="fw-bold text-secondary mb-2"><i class="bi bi-info-circle-fill me-1"></i>Navodila naloge:</h6>
+                <div class="small text-dark" style="white-space: pre-line;">{{ naloga.navodila }}</div>
+            </div>
+
+            <!-- Informacija o poimenovanju datoteke po navodilih -->
+            <div class="alert alert-info py-2 small mb-4">
+                <i class="bi bi-file-earmark-code me-1"></i>
+                <strong>Avtomatsko poimenovanje po navodilih naloge:</strong><br>
+                Sistem bo datoteko na strežniku shranil pod formatom:
+                <code>{{ user.last_name }} {{ user.first_name }} – {{ naloga.naslov }}.končnica</code>
+            </div>
+
+            <!-- Opozorilo za ponovno oddajo (če je naloga že bila oddana) -->
+            {% if ze_oddano %}
+                <div class="alert alert-resubmit p-3 mb-4">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-exclamation-triangle-fill fs-3 text-warning me-3"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">To nalogo ste že oddali!</h6>
+                            <p class="small mb-2">
+                                Obstoječa oddaja: <strong>{{ obstojeca_oddaja.ime_datoteke }}</strong><br>
+                                Datum zadnje oddaje: <strong>{{ obstojeca_oddaja.oddano_ob|date:"d.m.Y H:i" }}</strong>
+                            </p>
+                            <p class="small text-danger fw-semibold mb-0">
+                                <i class="bi bi-shield-exclamation"></i> V skladu z navodili bo ponovna oddaja povozila (prepisala) prejšnjo datoteko na strežniku, vendar ŠELE potem, ko to spodaj izrecno potrdite!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Obrazec za oddajo -->
+            <form method="post" enctype="multipart/form-data" novalidate id="obrazecOddaja">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        {% if ze_oddano %}Izberite novo datoteko za prepis *{% else %}Izberite datoteko za oddajo *{% endif %}
+                    </label>
+                    {{ form.datoteka }}
+                    {% if form.datoteka.errors %}
+                        <div class="text-danger small mt-1">{{ form.datoteka.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Opomba učitelju (opcijsko)</label>
+                    {{ form.opomba }}
+                </div>
+
+                {% if ze_oddano %}
+                    <div class="p-3 mb-4 bg-warning-subtle border border-warning rounded">
+                        <div class="form-check">
+                            {{ form.potrditev_prepisa }}
+                            <label class="form-check-label fw-bold text-dark" for="{{ form.potrditev_prepisa.id_for_label }}">
+                                Potrjujem, da želim prepisati obstoječo oddajo na strežniku.
+                            </label>
+                        </div>
+                        {% if form.potrditev_prepisa.errors %}
+                            <div class="text-danger small mt-1 fw-bold">
+                                {{ form.potrditev_prepisa.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'ucenec_predmet_gradiva' predmet.pk %}" class="btn btn-outline-secondary">Prekliči</a>
+                    <button type="submit" class="btn {% if ze_oddano %}btn-warning text-dark fw-bold{% else %}btn-success{% endif %}">
+                        {% if ze_oddano %}
+                            <i class="bi bi-arrow-repeat me-1"></i> Prepiši obstoječo oddajo
+                        {% else %}
+                            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Oddaj nalogo
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

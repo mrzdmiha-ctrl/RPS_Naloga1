@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Potrditev izbrisa | E-Šola{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-6">
+        <div class="card card-custom p-4 border-danger shadow-sm">
+            <div class="text-center mb-3">
+                <i class="bi bi-exclamation-triangle-fill text-danger display-3"></i>
+                <h3 class="fw-bold mt-2">Potrditev izbrisa</h3>
+                <p class="text-muted">Ali ste prepričani, da želite izbrisati {{ tip }}?</p>
+            </div>
+
+            <div class="alert alert-secondary text-center fw-bold">
+                {{ objekt }}
+            </div>
+
+            <p class="text-danger small text-center">
+                <i class="bi bi-shield-exclamation"></i> Pozor: Tega dejanja ni mogoče razveljaviti. Vsi povezani podatki bodo odstranjeni.
+            </p>
+
+            <form method="post" class="d-flex justify-content-center gap-3 mt-4">
+                {% csrf_token %}
+                {% if nazaj_pk %}
+                    <a href="{% url nazaj_url pk=nazaj_pk %}" class="btn btn-outline-secondary px-4">Prekliči</a>
+                {% else %}
+                    <a href="{% url nazaj_url %}" class="btn btn-outline-secondary px-4">Prekliči</a>
+                {% endif %}
+                <button type="submit" class="btn btn-danger px-4">
+                    <i class="bi bi-trash-fill me-1"></i> Da, izbriši
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

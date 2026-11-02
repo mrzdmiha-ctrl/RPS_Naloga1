@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Moji predmeti | E-Šola{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-1"><i class="bi bi-book-fill text-primary me-2"></i>Moji vpisani predmeti</h2>
+    <p class="text-muted mb-0">Seznam predmetov, ki jih obiskujete. Za vsak predmet lahko pregledujete in prenašate gradiva ter oddajate naloge.</p>
+</div>
+
+<div class="row g-4">
+    {% for predmet in predmeti %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-custom h-100 p-3 d-flex flex-column shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-primary font-monospace fs-6">{{ predmet.koda }}</span>
+                    <span class="badge bg-light text-dark border">{{ predmet.letnik }}. letnik</span>
+                </div>
+                <h4 class="fw-bold text-dark mb-2">{{ predmet.naziv }}</h4>
+                <p class="text-muted small flex-grow-1">
+                    {{ predmet.opis|default:"Brez opisa." }}
+                </p>
+
+                <div class="mb-3 pt-2 border-top">
+                    <small class="text-muted d-block mb-1"><strong>Učitelji:</strong></small>
+                    {% with ucitelji=predmet.ucitelji.all %}
+                        {% if ucitelji %}
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for u in ucitelji %}
+                                    <span class="badge bg-info-subtle text-info border">
+                                        <i class="bi bi-person"></i> {{ u.priimek_ime }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <span class="small text-muted fst-italic">Brez učitelja</span>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+
+                <div class="mt-auto">
+                    <a href="{% url 'ucenec_predmet_gradiva' predmet.pk %}" class="btn btn-primary w-100">
+                        <i class="bi bi-folder-symlink me-1"></i> Odpri gradiva in naloge
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="card card-custom p-5 text-center">
+                <i class="bi bi-journal-x display-4 text-secondary mb-3"></i>
+                <h4>Nimate vpisanega nobenega predmeta</h4>
+                <p class="text-muted mb-0">Trenutno niste vpisani v noben predmet.</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

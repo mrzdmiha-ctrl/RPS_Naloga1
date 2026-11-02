@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ naslov_akcije }} | E-Šola{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card card-custom p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-0">{{ naslov_akcije }}</h3>
+                    <p class="text-muted small mb-0">Predmet: <strong>{{ predmet.naziv }}</strong> ({{ predmet.koda }})</p>
+                </div>
+                <a href="{% url 'ucitelj_predmet_detajli' predmet.pk %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Nazaj
+                </a>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Naslov naloge *</label>
+                    {{ form.naslov }}
+                    {% if form.naslov.errors %}
+                        <div class="text-danger small mt-1">{{ form.naslov.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Navodila za učence *</label>
+                    {{ form.navodila }}
+                    {% if form.navodila.errors %}
+                        <div class="text-danger small mt-1">{{ form.navodila.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Rok za oddajo naloge (opcijsko)</label>
+                    {{ form.rok_oddaje }}
+                    {% if form.rok_oddaje.errors %}
+                        <div class="text-danger small mt-1">{{ form.rok_oddaje.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'ucitelj_predmet_detajli' predmet.pk %}" class="btn btn-outline-secondary">Prekliči</a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check2-circle me-1"></i> Objavi nalogo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

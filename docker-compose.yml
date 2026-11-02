@@ -1,0 +1,67 @@
+services:
+  baza:
+    image: postgres:16-alpine
+    container_name: sola_baza
+    environment:
+      POSTGRES_DB: ${DB_NAME:-sola_is}
+      POSTGRES_USER: ${DB_USER:-sola_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sola_skrivno_geslo_2026}
+    volumes:
+      - baza_podatki:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-sola_user} -d ${DB_NAME:-sola_is}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - sola_mreza
+
+  aplikacija:
+    build:
+      context: ./aplikacija
+      dockerfile: Dockerfile
+    container_name: sola_aplikacija
+    depends_on:
+      baza:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=baza
+      - DB_PORT=5432
+    volumes:
+      - static_podatki:/app/staticfiles
+      - media_podatki:/app/media
+    expose:
+      - "8000"
+    restart: unless-stopped
+    networks:
+      - sola_mreza
+
+  spletni_streznik:
+    image: nginx:alpine
+    container_name: sola_nginx
+    depends_on:
+      - aplikacija
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_podatki:/app/staticfiles:ro
+      - media_podatki:/app/media:ro
+    restart: unless-stopped
+    networks:
+      - sola_mreza
+
+volumes:
+  baza_podatki:
+  static_podatki:
+  media_podatki:
+
+networks:
+  sola_mreza:
+    driver: bridge
+

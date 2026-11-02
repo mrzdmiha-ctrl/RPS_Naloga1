@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ naslov_akcije }} | E-Šola{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-custom p-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">{{ naslov_akcije }}</h3>
+                <a href="{% url 'admin_ucenci_seznam' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Nazaj na seznam
+                </a>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Ime *</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Priimek *</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Uporabniško ime *</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">E-poštni naslov</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Telefonska številka</label>
+                        {{ form.telefon }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">
+                            {% if ucenec %}Novo geslo (prazno = brez spremembe){% else %}Geslo *{% endif %}
+                        </label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <div class="text-danger small mt-1">{{ form.password.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Naslov bivanja</label>
+                    {{ form.naslov }}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold d-block">
+                        Predmeti, ki jih učenec obiskuje (po navodilih mora obiskovati več kot en predmet):
+                    </label>
+                    {% if form.predmeti.errors %}
+                        <div class="alert alert-danger py-2 small">{{ form.predmeti.errors }}</div>
+                    {% endif %}
+                    <div class="card p-3 bg-light" style="max-height: 250px; overflow-y: auto;">
+                        {% for choice in form.predmeti %}
+                            <div class="form-check">
+                                {{ choice.tag }}
+                                <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                    {{ choice.choice_label }}
+                                </label>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted small mb-0">Ni razpoložljivih predmetov.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'admin_ucenci_seznam' %}" class="btn btn-outline-secondary">Prekliči</a>
+                    <button type="submit" class="btn btn-warning text-dark fw-semibold">
+                        <i class="bi bi-save me-1"></i> Shrani učenca
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Šolski IS za delo na daljavo{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Lasten CSS -->
+    <link href="{% static 'css/custom.css' %}" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Navigacija -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'domov' %}">
+                <i class="bi bi-mortarboard-fill text-warning fs-3"></i>
+                <span>E-Šola <small class="fw-light fs-6 opacity-75">| Delo na daljavo</small></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% if user.is_authenticated %}
+                        {% if user.je_admin %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'admin_nadzorna_plosca' %}">
+                                    <i class="bi bi-speedometer2"></i> Nadzorna plošča
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'admin_predmeti_seznam' %}">
+                                    <i class="bi bi-journal-bookmark"></i> Predmeti
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'admin_ucitelji_seznam' %}">
+                                    <i class="bi bi-person-video3"></i> Učitelji
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'admin_ucenci_seznam' %}">
+                                    <i class="bi bi-people"></i> Učenci
+                                </a>
+                            </li>
+                        {% elif user.je_ucitelj %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'ucitelj_nadzorna_plosca' %}">
+                                    <i class="bi bi-easel2"></i> Moji predmeti
+                                </a>
+                            </li>
+                        {% elif user.je_ucenec %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'ucenec_nadzorna_plosca' %}">
+                                    <i class="bi bi-speedometer"></i> Pregled
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'ucenec_moji_predmeti' %}">
+                                    <i class="bi bi-book"></i> Moji predmeti
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
+                                <span class="badge 
+                                    {% if user.je_admin %}badge-admin{% elif user.je_ucitelj %}badge-ucitelj{% else %}badge-ucenec{% endif %}">
+                                    {{ user.get_vloga_display }}
+                                </span>
+                                <strong>{{ user.polno_ime }}</strong>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                <li>
+                                    <h6 class="dropdown-header">Prijavljeni kot {{ user.username }}</h6>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'profil' %}">
+                                        <i class="bi bi-person-gear"></i> Moj profil
+                                    </a>
+                                </li>
+                                {% if user.is_staff %}
+                                <li>
+                                    <a class="dropdown-item" href="/admin/" target="_blank">
+                                        <i class="bi bi-shield-lock"></i> Django Admin
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{% url 'odjava' %}">
+                                        <i class="bi bi-box-arrow-right"></i> Odjava
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'prijava' %}">
+                                <i class="bi bi-box-arrow-in-right"></i> Prijava
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-warning btn-sm ms-lg-2" href="{% url 'registracija' %}">
+                                <i class="bi bi-person-plus"></i> Registracija učenca
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sporočila / Flash messages -->
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm" role="alert">
+                    {% if message.tags == 'success' %}
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                    {% elif message.tags == 'danger' or message.tags == 'error' %}
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {% else %}
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                    {% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Glavna vsebina -->
+    <main class="container py-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Noga -->
+    <footer class="py-3 mt-5">
+        <div class="container text-center">
+            <p class="mb-0 text-light"><strong>E-Šola | Šolski informacijski sistem za delo na daljavo</strong></p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
+

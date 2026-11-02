@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ predmet.naziv }} | Učiteljski portal{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'ucitelj_nadzorna_plosca' %}" class="btn btn-outline-secondary btn-sm mb-3">
+        <i class="bi bi-arrow-left"></i> Nazaj na moje predmete
+    </a>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary fs-6 font-monospace">{{ predmet.koda }}</span>
+                <h2 class="fw-bold mb-0">{{ predmet.naziv }}</h2>
+            </div>
+            <p class="text-muted mt-1 mb-0">{{ predmet.letnik }}. letnik &bull; Vpisanih učencev: <strong>{{ predmet.st_ucencev }}</strong></p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'ucitelj_gradivo_dodaj' predmet.pk %}" class="btn btn-primary">
+                <i class="bi bi-cloud-arrow-up-fill me-1"></i> Naloži novo gradivo
+            </a>
+            <a href="{% url 'ucitelj_naloga_dodaj' predmet.pk %}" class="btn btn-outline-success">
+                <i class="bi bi-plus-circle me-1"></i> Objavi novo nalogo
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 1. GRADIVA PREDMETA -->
+<div class="card card-custom p-4 mb-4 shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0"><i class="bi bi-file-earmark-text text-primary me-2"></i>Učna gradiva za predmet</h4>
+        <span class="badge bg-secondary">{{ gradiva|length }} gradiv</span>
+    </div>
+
+    {% if gradiva %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Naslov gradiva</th>
+                        <th>Opis</th>
+                        <th>Avtor</th>
+                        <th>Naloženo dne</th>
+                        <th>Datoteka</th>
+                        <th class="text-end">Akcija</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in gradiva %}
+                        <tr>
+                            <td><strong>{{ g.naslov }}</strong></td>
+                            <td class="text-muted small">{{ g.opis|default:"/" }}</td>
+                            <td><span class="small">{{ g.avtor.priimek_ime }}</span></td>
+                            <td class="small">{{ g.nalozeno_ob|date:"d.m.Y H:i" }}</td>
+                            <td>
+                                <a href="{{ g.datoteka.url }}" class="btn btn-sm btn-outline-primary" download>
+                                    <i class="bi bi-download me-1"></i> Prenesi ({{ g.ime_datoteke }})
+                                </a>
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'ucitelj_gradivo_izbrisi' g.pk %}" class="btn btn-sm btn-outline-danger" title="Izbriši gradivo">
+                                    <i class="bi bi-trash"></i> Izbriši
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="bi bi-folder2-open display-4 d-block mb-2 text-secondary"></i>
+            Za ta predmet še ni naloženih gradiv.
+            <div class="mt-2">
+                <a href="{% url 'ucitelj_gradivo_dodaj' predmet.pk %}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-cloud-arrow-up me-1"></i> Naloži prvo gradivo
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- 2. NALOGE IN ODDAJE UČENCEV -->
+<div class="card card-custom p-4 shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0"><i class="bi bi-list-check text-success me-2"></i>Naloge in oddana dela učencev</h4>
+        <span class="badge bg-success">{{ naloge|length }} nalog</span>
+    </div>
+
+    {% if naloge %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Naslov naloge</th>
+                        <th>Rok za oddajo</th>
+                        <th>Število oddaj</th>
+                        <th>Objavil</th>
+                        <th class="text-end">Pregled oddaj</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for n in naloge %}
+                        <tr>
+                            <td>
+                                <strong>{{ n.naslov }}</strong>
+                                <div class="small text-muted">{{ n.navodila|truncatechars:100 }}</div>
+                            </td>
+                            <td>
+                                {% if n.rok_oddaje %}
+                                    <span class="badge {% if n.je_rok_potekel %}bg-danger{% else %}bg-light text-dark border{% endif %}">
+                                        <i class="bi bi-calendar-event me-1"></i> {{ n.rok_oddaje|date:"d.m.Y H:i" }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted small">Brez roka</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-info-subtle text-info-emphasis border">
+                                    <i class="bi bi-file-earmark-check"></i> {{ n.st_oddaj }} oddaj
+                                </span>
+                            </td>
+                            <td class="small">{{ n.avtor.priimek_ime }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'ucitelj_oddaje_pregled' n.pk %}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-eye-fill me-1"></i> Preglej oddane naloge ({{ n.st_oddaj }})
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="bi bi-journal-plus display-4 d-block mb-2 text-secondary"></i>
+            Za ta predmet še niste ustvarili nobene naloge.
+            <div class="mt-2">
+                <a href="{% url 'ucitelj_naloga_dodaj' predmet.pk %}" class="btn btn-sm btn-success">
+                    <i class="bi bi-plus-circle me-1"></i> Ustvari prvo nalogo
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

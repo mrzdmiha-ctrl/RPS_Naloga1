@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Gradiva: {{ predmet.naziv }} | E-Šola{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'ucenec_moji_predmeti' %}" class="btn btn-outline-secondary btn-sm mb-3">
+        <i class="bi bi-arrow-left"></i> Nazaj na moje predmete
+    </a>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary fs-6 font-monospace">{{ predmet.koda }}</span>
+                <h2 class="fw-bold mb-0">{{ predmet.naziv }}</h2>
+            </div>
+            <p class="text-muted mt-1 mb-0">{{ predmet.letnik }}. letnik &bull; {{ predmet.opis }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- 1. GRADIVA -->
+<div class="card card-custom p-4 mb-4 shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0 text-primary">
+            <i class="bi bi-file-earmark-text-fill me-2"></i>Učna gradiva predmeta
+        </h4>
+        <span class="badge bg-secondary">{{ gradiva|length }} gradiv</span>
+    </div>
+
+    {% if gradiva %}
+        <div class="list-group list-group-flush">
+            {% for g in gradiva %}
+                <div class="list-group-item d-flex flex-wrap justify-content-between align-items-center px-0 py-3">
+                    <div class="me-3">
+                        <h6 class="fw-bold mb-1">
+                            <i class="bi bi-file-earmark-arrow-down text-primary me-1"></i>
+                            {{ g.naslov }}
+                        </h6>
+                        {% if g.opis %}
+                            <p class="small text-muted mb-1">{{ g.opis }}</p>
+                        {% endif %}
+                        <small class="text-muted">
+                            Naložil: <strong>{{ g.avtor.priimek_ime }}</strong> dne {{ g.nalozeno_ob|date:"d.m.Y H:i" }}
+                        </small>
+                    </div>
+                    <div class="mt-2 mt-sm-0">
+                        <a href="{{ g.datoteka.url }}" class="btn btn-sm btn-outline-primary" download>
+                            <i class="bi bi-download me-1"></i> Prenesi gradivo ({{ g.ime_datoteke }})
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="bi bi-folder2-open display-4 text-secondary mb-2"></i>
+            <p class="mb-0">Za ta predmet učitelji še niso naložili gradiv.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- 2. NALOGE IN ODDAJA -->
+<div class="card card-custom p-4 shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0 text-success">
+            <i class="bi bi-pencil-square me-2"></i>Naloge za oddajo
+        </h4>
+        <span class="badge bg-success">{{ naloge|length }} nalog</span>
+    </div>
+
+    {% if naloge %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Naloga</th>
+                        <th>Rok za oddajo</th>
+                        <th>Vaš status oddaje</th>
+                        <th class="text-end">Akcija</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for n in naloge %}
+                        {% with oddaja=oddaje|default:'' %}
+                            <tr>
+                                <td>
+                                    <strong>{{ n.naslov }}</strong>
+                                    <div class="small text-muted">{{ n.navodila }}</div>
+                                </td>
+                                <td>
+                                    {% if n.rok_oddaje %}
+                                        <span class="badge {% if n.je_rok_potekel %}bg-danger{% else %}bg-light text-dark border{% endif %}">
+                                            <i class="bi bi-calendar-event me-1"></i> {{ n.rok_oddaje|date:"d.m.Y H:i" }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted small">Brez roka</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if n.id in oddaje %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle-fill"></i> Oddano
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-clock"></i> Še ni oddano
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'ucenec_naloga_oddaja' n.pk %}" class="btn btn-sm {% if n.id in oddaje %}btn-outline-success{% else %}btn-success{% endif %}">
+                                        {% if n.id in oddaje %}
+                                            <i class="bi bi-arrow-repeat me-1"></i> Ponovna oddaja
+                                        {% else %}
+                                            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Oddaj nalogo
+                                        {% endif %}
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endwith %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="bi bi-check-circle display-4 text-secondary mb-2"></i>
+            <p class="mb-0">Pri tem predmetu trenutno ni odprtih nalog.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}E-Šola | Šolski IS za delo na daljavo{% endblock %}
+
+{% block content %}
+<div class="row align-items-center py-5">
+    <div class="col-lg-7">
+        <span class="badge bg-primary px-3 py-2 mb-3 rounded-pill">Sistem za delo na daljavo</span>
+        <h1 class="display-4 fw-bold text-dark mb-3">
+            Sodobna platforma za poučevanje in učenje na daljavo
+        </h1>
+        <p class="lead text-muted mb-4">
+            Enoten šolski informacijski sistem, ki omogoča nemoteno sodelovanje med administratorji, učitelji in učenci. Varno deljenje gradiv, obveščanje ter zanesljiva oddaja domačih nalog.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+            <a href="{% url 'prijava' %}" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Vstop v sistem (Prijava)
+            </a>
+            <a href="{% url 'registracija' %}" class="btn btn-outline-secondary btn-lg px-4">
+                <i class="bi bi-person-plus me-2"></i> Registracija učenca
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-5 mt-4 mt-lg-0">
+        <div class="card card-custom p-4 border-0 shadow-lg">
+            <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-people-fill me-2"></i>Vloge v sistemu</h5>
+            
+            <div class="d-flex align-items-start mb-3">
+                <div class="bg-danger text-white rounded p-2 me-3">
+                    <i class="bi bi-shield-lock-fill fs-4"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1 fw-bold">Administrator</h6>
+                    <p class="small text-muted mb-0">Upravljanje predmetov (10+), učiteljev (20+) in učencev (100+) ter njihovih medsebojnih povezav.</p>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-start mb-3">
+                <div class="bg-info text-white rounded p-2 me-3">
+                    <i class="bi bi-person-video3 fs-4"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1 fw-bold">Učitelj</h6>
+                    <p class="small text-muted mb-0">Nalaganje in brisanje učnih gradiv ter pregledovanje oddanih nalog za dodeljene predmete.</p>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-start">
+                <div class="bg-success text-white rounded p-2 me-3">
+                    <i class="bi bi-mortarboard-fill fs-4"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1 fw-bold">Učenec</h6>
+                    <p class="small text-muted mb-0">Pregled vpisanih predmetov, gradiv in oddaja nalog z varnim prepisom prejšnjih verzij.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

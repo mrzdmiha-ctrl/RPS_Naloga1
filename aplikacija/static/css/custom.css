@@ -1,0 +1,122 @@
+/* Glavni slogi */
+:root {
+    --primary-color: #1e3a8a;
+    --primary-hover: #1e40af;
+    --secondary-color: #0d9488;
+    --accent-color: #f59e0b;
+    --bg-light: #f8fafc;
+    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --border-radius: 0.75rem;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navigacija */
+.navbar-custom {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Kartice */
+.card-custom {
+    background: #ffffff;
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.stat-card {
+    border-left: 5px solid var(--primary-color);
+}
+
+.stat-card.stat-teal {
+    border-left-color: #0d9488;
+}
+
+.stat-card.stat-amber {
+    border-left-color: #f59e0b;
+}
+
+.stat-card.stat-purple {
+    border-left-color: #7c3aed;
+}
+
+/* Značke in statusi */
+.badge-admin {
+    background-color: #dc2626;
+    color: #fff;
+}
+
+.badge-ucitelj {
+    background-color: #0284c7;
+    color: #fff;
+}
+
+.badge-ucenec {
+    background-color: #16a34a;
+    color: #fff;
+}
+
+/* Tabele */
+.table-responsive {
+    background: #fff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+}
+
+.table th {
+    background-color: #f1f5f9;
+    font-weight: 600;
+    color: #475569;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+/* Gumbi */
+.btn-primary-custom {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+}
+
+.btn-primary-custom:hover {
+    background-color: var(--primary-hover);
+    color: #ffffff;
+}
+
+/* Opozorilo za prepis naložene naloge */
+.alert-resubmit {
+    background-color: #fffbeb;
+    border: 2px solid #f59e0b;
+    border-radius: var(--border-radius);
+    color: #92400e;
+}
+
+/* Footer */
+footer {
+    background-color: #0f172a;
+    color: #94a3b8;
+    margin-top: auto;
+}

@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Upravljanje učencev | E-Šola{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-people-fill text-warning me-2"></i>Upravljanje učencev</h2>
+        <p class="text-muted mb-0">Seznam učencev in njihovih vpisanih predmetov (v bazi mora biti najmanj 100 učencev).</p>
+    </div>
+    <a href="{% url 'admin_ucenec_ustvari' %}" class="btn btn-warning text-dark fw-semibold">
+        <i class="bi bi-person-plus-fill me-1"></i> Dodaj novega učenca
+    </a>
+</div>
+
+<!-- Filtri in iskanje -->
+<div class="card card-custom p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" class="form-control" placeholder="Išči po imenu, priimku, uporabniškem imenu..." value="{{ poizvedba }}">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select name="predmet" class="form-select">
+                <option value="">-- Vsi predmeti --</option>
+                {% for p in predmeti %}
+                    <option value="{{ p.id }}" {% if izbran_predmet == p.id|stringformat:"s" %}selected{% endif %}>
+                        {{ p.koda }} - {{ p.naziv }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-outline-primary flex-grow-1">Filtriraj</button>
+            {% if poizvedba or izbran_predmet %}
+                <a href="{% url 'admin_ucenci_seznam' %}" class="btn btn-outline-secondary">Počisti</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Tabela učencev -->
+<div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Učenec</th>
+                <th>Uporabniško ime</th>
+                <th>E-pošta / Telefon</th>
+                <th>Vpisani predmeti (več kot 1)</th>
+                <th class="text-end">Akcije</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ucenec in ucenci %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-warning-subtle text-warning-emphasis rounded-circle p-2 me-2">
+                                <i class="bi bi-mortarboard fs-5"></i>
+                            </div>
+                            <div>
+                                <strong>{{ ucenec.priimek_ime }}</strong>
+                                {% if ucenec.naslov %}
+                                    <div class="small text-muted">{{ ucenec.naslov }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td><code>{{ ucenec.username }}</code></td>
+                    <td>
+                        <div><i class="bi bi-envelope me-1 text-muted"></i>{{ ucenec.email|default:"/" }}</div>
+                        {% if ucenec.telefon %}
+                            <div class="small text-muted"><i class="bi bi-telephone me-1"></i>{{ ucenec.telefon }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% with predmeti=ucenec.obiskuje_predmete.all %}
+                            {% if predmeti %}
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for p in predmeti %}
+                                        <span class="badge bg-secondary-subtle text-secondary-emphasis border">
+                                            {{ p.koda }}
+                                        </span>
+                                    {% endfor %}
+                                    <span class="small text-muted ms-1">({{ predmeti|length }} predmetov)</span>
+                                </div>
+                            {% else %}
+                                <span class="badge bg-danger">Ni vpisanih predmetov!</span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'admin_ucenec_uredi' ucenec.pk %}" class="btn btn-outline-primary" title="Uredi učenca">
+                                <i class="bi bi-pencil"></i> Uredi
+                            </a>
+                            <a href="{% url 'admin_ucenec_izbrisi' ucenec.pk %}" class="btn btn-outline-danger" title="Izbriši učenca">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">Ni najdenih učencev.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Paginacija -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mt-3">
+    <div class="text-muted small">
+        Prikazano <strong>{{ ucenci.start_index }} - {{ ucenci.end_index }}</strong> od skupaj <strong>{{ ucenci.paginator.count }}</strong> učencev
+    </div>
+    {% if ucenci.has_other_pages %}
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                {% if ucenci.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ ucenci.previous_page_number }}{% if poizvedba %}&q={{ poizvedba }}{% endif %}{% if izbran_predmet %}&predmet={{ izbran_predmet }}{% endif %}">&laquo; Prejšnja</a>
+                    </li>
+                {% endif %}
+
+                {% for i in ucenci.paginator.page_range %}
+                    {% if ucenci.number == i %}
+                        <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                    {% elif i > ucenci.number|add:'-3' and i < ucenci.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}{% if poizvedba %}&q={{ poizvedba }}{% endif %}{% if izbran_predmet %}&predmet={{ izbran_predmet }}{% endif %}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if ucenci.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ ucenci.next_page_number }}{% if poizvedba %}&q={{ poizvedba }}{% endif %}{% if izbran_predmet %}&predmet={{ izbran_predmet }}{% endif %}">Naslednja &raquo;</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}
+

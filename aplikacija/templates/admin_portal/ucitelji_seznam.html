@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Upravljanje učiteljev | E-Šola{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-person-video3 text-info me-2"></i>Upravljanje učiteljev</h2>
+        <p class="text-muted mb-0">Seznam učiteljev in predmetov, ki jih poučujejo (v bazi mora biti najmanj 20 učiteljev).</p>
+    </div>
+    <a href="{% url 'admin_ucitelj_ustvari' %}" class="btn btn-info text-white">
+        <i class="bi bi-person-plus-fill me-1"></i> Dodaj novega učitelja
+    </a>
+</div>
+
+<!-- Iskalnik -->
+<div class="card card-custom p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-9">
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" class="form-control" placeholder="Išči po imenu, priimku, uporabniškem imenu ali e-pošti..." value="{{ poizvedba }}">
+            </div>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-outline-info flex-grow-1">Filtriraj</button>
+            {% if poizvedba %}
+                <a href="{% url 'admin_ucitelji_seznam' %}" class="btn btn-outline-secondary">Počisti</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Tabela učiteljev -->
+<div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Učitelj</th>
+                <th>Uporabniško ime</th>
+                <th>E-pošta / Telefon</th>
+                <th>Predmeti, ki jih poučuje</th>
+                <th class="text-end">Akcije</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ucitelj in ucitelji %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-info-subtle text-info rounded-circle p-2 me-2">
+                                <i class="bi bi-person-badge fs-5"></i>
+                            </div>
+                            <div>
+                                <strong>{{ ucitelj.priimek_ime }}</strong>
+                            </div>
+                        </div>
+                    </td>
+                    <td><code>{{ ucitelj.username }}</code></td>
+                    <td>
+                        <div><i class="bi bi-envelope me-1 text-muted"></i>{{ ucitelj.email|default:"/" }}</div>
+                        {% if ucitelj.telefon %}
+                            <div class="small text-muted"><i class="bi bi-telephone me-1"></i>{{ ucitelj.telefon }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% with predmeti=ucitelj.poucuje_predmete.all %}
+                            {% if predmeti %}
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for p in predmeti %}
+                                        <span class="badge bg-primary-subtle text-primary border">
+                                            {{ p.koda }} - {{ p.naziv }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <span class="text-muted small fst-italic">Trenutno ne poučuje nobenega predmeta</span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'admin_ucitelj_uredi' ucitelj.pk %}" class="btn btn-outline-primary" title="Uredi učitelja">
+                                <i class="bi bi-pencil"></i> Uredi
+                            </a>
+                            <a href="{% url 'admin_ucitelj_izbrisi' ucitelj.pk %}" class="btn btn-outline-danger" title="Izbriši učitelja">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">Ni najdenih učiteljev.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="mt-3 text-muted small">
+    Skupno učiteljev: <strong>{{ ucitelji|length }}</strong>
+</div>
+{% endblock %}
+

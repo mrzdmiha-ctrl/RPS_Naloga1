@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Upravljanje predmetov | E-Šola{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-journal-bookmark-fill text-primary me-2"></i>Upravljanje predmetov</h2>
+        <p class="text-muted mb-0">Seznam vseh šolskih predmetov (v bazi mora biti najmanj 10 predmetov).</p>
+    </div>
+    <a href="{% url 'admin_predmet_ustvari' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Dodaj nov predmet
+    </a>
+</div>
+
+<!-- Iskalnik -->
+<div class="card card-custom p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-9">
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" class="form-control" placeholder="Išči po nazivu ali kratici predmeta..." value="{{ poizvedba }}">
+            </div>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-outline-primary flex-grow-1">Filtriraj</button>
+            {% if poizvedba %}
+                <a href="{% url 'admin_predmeti_seznam' %}" class="btn btn-outline-secondary">Počisti</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Tabela predmetov -->
+<div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Koda</th>
+                <th>Naziv predmeta</th>
+                <th>Letnik</th>
+                <th>Učitelji (poučujejo)</th>
+                <th>Vpisani učenci</th>
+                <th class="text-end">Akcije</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for predmet in predmeti %}
+                <tr>
+                    <td><span class="badge bg-secondary font-monospace">{{ predmet.koda }}</span></td>
+                    <td>
+                        <strong>{{ predmet.naziv }}</strong>
+                        {% if predmet.opis %}
+                            <div class="small text-muted text-truncate" style="max-width: 320px;">{{ predmet.opis }}</div>
+                        {% endif %}
+                    </td>
+                    <td><span class="badge bg-light text-dark border">{{ predmet.letnik }}. letnik</span></td>
+                    <td>
+                        {% with ucitelji=predmet.ucitelji.all %}
+                            {% if ucitelji %}
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for u in ucitelji %}
+                                        <span class="badge bg-info-subtle text-info-emphasis border">
+                                            <i class="bi bi-person"></i> {{ u.priimek_ime }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <span class="text-muted small fst-italic">Brez dodeljenega učitelja</span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        <span class="badge bg-success-subtle text-success-emphasis border">
+                            <i class="bi bi-people"></i> {{ predmet.st_ucencev_count }} učencev
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'admin_predmet_uredi' predmet.pk %}" class="btn btn-outline-primary" title="Uredi predmet">
+                                <i class="bi bi-pencil"></i> Uredi
+                            </a>
+                            <a href="{% url 'admin_predmet_izbrisi' predmet.pk %}" class="btn btn-outline-danger" title="Izbriši predmet">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">Ni najdenih predmetov.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="mt-3 text-muted small">
+    Skupno predmetov: <strong>{{ predmeti|length }}</strong>
+</div>
+{% endblock %}
+

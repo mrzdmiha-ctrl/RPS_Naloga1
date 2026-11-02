@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Registracija učenca | E-Šola{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="card card-custom p-4 shadow-sm">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-plus-fill text-success display-4"></i>
+                <h3 class="fw-bold mt-2">Registracija novega učenca</h3>
+                <p class="text-muted small">Ustvarite svoj uporabniški profil za dostop do šolskega gradiva in oddajo nalog.</p>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_first_name" class="form-label fw-semibold">Ime *</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_last_name" class="form-label fw-semibold">Priimek *</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_username" class="form-label fw-semibold">Uporabniško ime *</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_email" class="form-label fw-semibold">E-poštni naslov *</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_telefon" class="form-label fw-semibold">Telefonska številka</label>
+                        {{ form.telefon }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_naslov" class="form-label fw-semibold">Naslov bivanja</label>
+                        {{ form.naslov }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_password1" class="form-label fw-semibold">Geslo *</label>
+                    <input type="password" name="password1" class="form-control" id="id_password1" placeholder="Izberite varno geslo (vsaj 6 znakov)" required>
+                    {% if form.password1.errors %}
+                        <div class="text-danger small mt-1">{{ form.password1.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_password2" class="form-label fw-semibold">Ponovitev gesla *</label>
+                    <input type="password" name="password2" class="form-control" id="id_password2" placeholder="Ponovno vpišite geslo" required>
+                    {% if form.password2.errors %}
+                        <div class="text-danger small mt-1">{{ form.password2.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">
+                    <i class="bi bi-check2-circle me-1"></i> Ustvari račun učenca
+                </button>
+            </form>
+
+            <div class="text-center mt-3">
+                <span class="text-muted small">Že imate račun?</span>
+                <a href="{% url 'prijava' %}" class="small text-decoration-none fw-semibold">Prijava tukaj</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
